@@ -1,0 +1,9 @@
+**Run:** `pip install -r requirements.txt`, copy `.env.example` to `.env` and paste ONE LLM API key (Anthropic, OpenAI, Gemini, OpenRouter, or any OpenAI-compatible URL; `LLM_MODEL` overrides the model), then `python run.py`. It writes `output/newsletter_DATE.html` (one page) and `output/items_DATE.json` (audit trail). With no key it uses a logged-in Claude Code CLI if one is found; with neither, it still produces a keyword-only newsletter.
+
+**Sources used (all RSS, no API keys):** Google News search (funding rounds; negative news; watchlist searches for GenZero's portfolio, competitors and rival investors, built from `config.yaml`), TechCrunch Climate, CTVC (deals), Carbon Brief (policy/research), Eco-Business (Asia).
+
+**Sources rejected:** Axios Pro (paywall, Cloudflare 403), IEA (no feed), UNFCCC (bot wall), GDELT (rate-limited, empty results), arXiv (too academic), Carbon Herald (intermittent 403).
+
+**How it works:** fetch the last 7 days and dedupe, then the LLM grades every item on a weighted importance matrix (exposure to GenZero, money at stake, downside risk, investment-case signal, actionability, specificity; see `config.yaml`); the top 7 each get a second call that reasons through investor concerns and precedents to write What happened / Link to GenZero / Why it matters.
+
+**Known limitations:** it reads headlines and summaries only (no full text), so analysis is only as specific as the source snippet. Google News RSS is unofficial (and ignores the 7-day filter on long name lists, so watchlist searches are split into small batches). Scores vary a few points between runs. The portfolio and peer lists are from public sources and partly unverified. It needs an LLM API key or a logged-in Claude Code CLI; non-Claude providers are supported but were tested only with mocks. Output should be checked before forwarding.

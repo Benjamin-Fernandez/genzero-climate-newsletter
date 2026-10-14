@@ -1,0 +1,243 @@
+sources:
+  - name: Google News (funding)
+    type: funding
+    kind: google_news
+    url: "https://news.google.com/rss/search?q=%28climate%20OR%20cleantech%20OR%20decarbonization%20OR%20%22carbon%20removal%22%29%20%28%22series%20a%22%20OR%20%22series%20b%22%20OR%20%22seed%20round%22%20OR%20%22funding%20round%22%20OR%20%22raises%20%24%22%29%20-%22raises%20concern%22%20-%22raises%20concerns%22%20-%22raises%20questions%22%20-%22raises%20alarm%22%20-%22raises%20fines%22%20-%22raises%20forecast%22%20-%22El%20Ni%C3%B1o%22%20when%3A7d&hl=en-SG&gl=SG&ceid=SG:en"
+  - name: Google News (negative)
+    type: risk
+    kind: google_news
+    url: "https://news.google.com/rss/search?q=%28cleantech%20OR%20%22climate%20tech%22%20OR%20hydrogen%20OR%20%22carbon%20capture%22%20OR%20%22offshore%20wind%22%29%20%28bankruptcy%20OR%20cancelled%20OR%20layoffs%20OR%20%22shuts%20down%22%20OR%20scrapped%29%20when%3A7d&hl=en-SG&gl=SG&ceid=SG:en"
+  - name: TechCrunch Climate
+    type: news
+    url: "https://techcrunch.com/category/climate/feed/"
+  - name: CTVC
+    type: deals
+    url: "https://ctvc.co/rss/"
+  - name: Carbon Brief
+    type: policy
+    url: "https://carbonbrief.org/feed/"
+  - name: Eco-Business
+    type: asia_news
+    url: "https://eco-business.com/feeds/news/"
+  - name: Google News (portfolio)
+    type: watchlist
+    kind: google_news
+    watchlist: [portfolio, partners_watch]
+  - name: Google News (peers)
+    type: watchlist
+    kind: google_news
+    watchlist: [sector_peers, competitor_investors]
+
+# Generic names only count together with a qualifier word in the watchlist searches
+watchlist_qualifiers:
+  Rize: rice
+  Imperative: carbon
+  Perennial: soil
+  Keppel: "(carbon OR coal OR transition)"
+  Mizuho: "(carbon OR transition)"
+  South Pole: carbon
+  Newlight: biomaterials
+  Twelve: "(carbon OR fuel)"
+  Sweep: carbon
+  Watershed: carbon
+  Normative: carbon
+  Regrow: agriculture
+  Equis: energy
+  Origin Materials: plastic
+  Climate Investment: fund
+  Just Climate: fund
+  Actis: energy
+
+limits:
+  days: 7   # FIXED: the user requires a strict 7-day window; the code never looks further back
+  max_items_for_llm: 200  # safety cap only (cut by recency); every in-window item is graded
+  max_items_on_page: 7
+  timeout: 20
+
+genzero:
+  focus_areas:
+    - "Nature-based solutions: forestry, landscape restoration, agricultural decarbonisation (rice methane)"
+    - "Technology-based solutions: carbon removal, sustainable fuels (SAF), low-carbon materials, renewables"
+    - "Carbon ecosystem enablers: carbon ratings, exchanges, MRV, project developers, transition credits, Article 6/CORSIA"
+  # Direct investments and fund (LP) investments
+  portfolio:
+    - {name: Aurora Sustainable Lands, sector: forestry carbon removals}
+    - {name: Rize, sector: rice methane agritech}
+    - {name: AJA Climate Solutions, sector: nature-based carbon projects}
+    - {name: Brújula Verde, sector: reforestation carbon removals}
+    - {name: InverBosques, sector: reforestation carbon removals}
+    - {name: Imperative, sector: ecosystem restoration carbon}
+    - {name: Good Rice Alliance, sector: rice methane credits}
+    - {name: BTG Pactual Timberland Investment Group, sector: reforestation fund}
+    - {name: New Forests, sector: forestry fund}
+    - {name: SilviPar, sector: forestry fund}
+    - {name: Carbo Culture, sector: biochar carbon removal}
+    - {name: CycloKinetics, sector: sustainable aviation fuel}
+    - {name: Newlight, sector: biomaterials}
+    - {name: PCG Global, sector: renewable energy}
+    - {name: Terra CO2, sector: low-carbon cement}
+    - {name: Velocys, sector: sustainable aviation fuel}
+    - {name: At One Ventures, sector: climate VC fund}
+    - {name: Breakthrough Energy Ventures, sector: climate VC fund}
+    - {name: Carbon Direct Capital, sector: carbon management fund}
+    - {name: Decarbonization Partners, sector: late-stage decarbonisation fund}
+    - {name: Energy Impact Partners, sector: climate VC fund}
+    - {name: Lightrock, sector: growth climate fund}
+    - {name: Seraya Partners, sector: Asia energy transition infrastructure fund}
+    - {name: BeZero Carbon, sector: carbon ratings}
+    - {name: Chooose, sector: climate software}
+    - {name: Climate Impact X, sector: carbon exchange}
+    - {name: South Pole, sector: carbon project developer}
+    - {name: Perennial, sector: soil carbon MRV}
+  # Not investments, but watch for reputational / counterparty risk
+  partners_watch:
+    - {name: C-Quest Capital, sector: cookstoves (exited)}
+    - {name: ACEN, sector: coal phase-out transition credits partner}
+    - {name: Keppel, sector: coal phase-out transition credits partner}
+    - {name: Mizuho, sector: transition credits partner}
+    - {name: Green Fuel Forward, sector: SAF demand alliance}
+  competitor_investors:
+    - {name: Breakthrough Energy Ventures, type: climate VC}
+    - {name: Lowercarbon Capital, type: climate VC}
+    - {name: Brookfield Global Transition Fund, type: transition infrastructure PE}
+    - {name: TPG Rise Climate, type: climate PE}
+    - {name: Just Climate, type: growth climate PE}
+    - {name: Macquarie Green Investment Group, type: renewables infrastructure}
+    - {name: ALTÉRRA, type: sovereign-backed climate vehicle}
+    - {name: Climate Investment, type: corporate-backed climate fund}
+    - {name: Energy Impact Partners, type: climate VC}
+    - {name: Climate Asset Management, type: natural capital fund}
+    - {name: Mirova, type: natural capital fund}
+    - {name: Pentagreen Capital, type: SEA sustainable infrastructure debt}
+    - {name: Clime Capital, type: SEA clean energy VC}
+    - {name: Wavemaker Impact, type: SEA climate venture builder}
+    - {name: Actis, type: emerging-markets energy transition PE}
+  keywords:
+    - reforestation
+    - afforestation
+    - forestry
+    - nature-based solutions
+    - landscape restoration
+    - improved forest management
+    - REDD+
+    - mangrove
+    - soil carbon
+    - regenerative agriculture
+    - rice methane
+    - biodiversity credits
+    - carbon removal
+    - direct air capture
+    - biochar
+    - carbon capture
+    - CCUS
+    - sustainable aviation fuel
+    - SAF
+    - e-fuels
+    - green hydrogen
+    - low-carbon cement
+    - green steel
+    - bioplastic
+    - battery storage
+    - renewable energy
+    - energy transition
+    - carbon credits
+    - carbon market
+    - voluntary carbon market
+    - carbon offset
+    - carbon rating
+    - MRV
+    - Article 6
+    - CORSIA
+    - transition credits
+    - coal phase-out
+    - decarbonisation
+    - decarbonization
+    - climate tech
+
+llm:
+  # Used only for the backend that is detected (API key in .env wins over the Claude CLI). LLM_MODEL env overrides.
+  default_models:
+    anthropic: claude-opus-5-5
+    openai: gpt-5
+    gemini: gemini-2.5-flash
+    openrouter: openai/gpt-5
+    claude_cli: sonnet
+    # openai_compatible: no default, set LLM_MODEL
+  effort: {triage: medium, impact: high}   # used by the Anthropic backend
+  triage_timeout: 300
+  impact_timeout: 180
+  max_workers: 4
+  triage_batch_size: 40
+
+impact_framework:
+  direction_note: "arrow = direction of the underlying variable (competition up = intensifies); judge good/bad for GenZero yourself"
+  chain: "what happened > GenZero exposure (direct/fund LP/enabler/none) > what usually follows > metrics moved with direction > final lines (so what, watch-for, timeframe)"
+  concerns:
+    - {id: valuation, name: Valuation and comparable marks, question: "How does this change the mark or comparable set for a GenZero holding or LP fund?"}
+    - {id: capital, name: Follow-on capital and dilution, question: "How does this change the odds or terms of the next round for the affected holding?"}
+    - {id: exit, name: Exit routes, question: "How does this change who could buy or list the holding, and at what multiple?"}
+    - {id: demand, name: Revenue, demand and offtake, question: "How does this change contracted or likely demand for the holding's product or credits?"}
+    - {id: economics, name: Unit economics and technology risk, question: "How does this change cost per unit or technical risk?"}
+    - {id: carbon_price, name: Carbon credit price and supply, question: "How does this change price or supply for credit types GenZero holds or trades?"}
+    - {id: integrity, name: Integrity, counterparty, reputational and ESG risk, question: "Could this damage credit quality, a partner or GenZero's reputation?"}
+    - {id: policy, name: Policy and regulatory exposure, question: "How does this change subsidy, mandate or market-access rules for the holding?"}
+    - {id: competition, name: Competitive position, question: "Does this strengthen or weaken the holding against named peers?"}
+    - {id: pipeline, name: Deal pipeline and co-investment, question: "Does this open or close an investable deal, entry price or co-investor?"}
+    - {id: execution, name: Project execution, question: "Does this change timing, capex or delivery risk on a project or plant?"}
+  playbook:
+    - {event_type: peer_fundraise, typical_effects: "Peer gets runway and validates sector, comps lift; then deal and talent competition and anchored round prices. Weeks to 6 months.", metrics: {valuation: up, capital: up, competition: up, exit: mixed}, precedents: ["Twelve US$645m incl. TPG Rise-led project equity", "H1 2026 climate VC +55% (Currence)"]}
+    - {event_type: distress, typical_effects: "Markdowns on company and comps, lenders and offtakers reassess; then selectivity against capex-heavy models, cheap asset sales, talent spill. 1 to 12 months.", metrics: {valuation: down, capital: down, exit: down, pipeline: up, competition: mixed}, precedents: ["Northvolt bankruptcy 2024-25", "Climeworks cut 22% staff May 2025", "Fulcrum Chapter 11 Sept 2024"]}
+    - {event_type: fund_close, typical_effects: "Signals LP appetite and dry powder; then tighter entry prices; a GenZero fund manager closing helps NAV and reserves. Deployment 12 to 36 months.", metrics: {capital: up, competition: up, pipeline: mixed, valuation: up}, precedents: ["Brookfield BGTF II US$20bn Oct 2025", "TPG Rise Climate US$7.3bn"]}
+    - {event_type: exit_ma_ipo, typical_effects: "Sets multiple and shows buyer universe, comps repriced; then consolidation pressure on sub-scale peers. 0 to 12 months.", metrics: {exit: up, valuation: up, competition: up, pipeline: mixed}, precedents: ["MSCI buys Trove Research 2023", "CIX-Carbonplace merger Aug 2026"]}
+    - {event_type: policy_support, typical_effects: "Demand visibility improves, projects reach FID; then capital inflow, peers raise, input costs rise. 3 to 24 months.", metrics: {policy: up, demand: up, carbon_price: up, capital: up, economics: up, competition: up}, precedents: ["CORSIA Phase 1 eligible supply 38M vs demand ~163M (Sylvera Jun 2026)", "CORSIA credits US$21.70 auction"]}
+    - {event_type: policy_rollback, typical_effects: "Project economics and tax-equity break, marks fall, layoffs and delays; then capital rotates to other geographies and tech. 0 to 12 months.", metrics: {policy: down, demand: down, valuation: down, capital: down, execution: down, pipeline: mixed}, precedents: ["US OBBBA July 2025 (45V, 48E/45Y, FEOC)", "H1 2025 climate funding -19% (CTVC)"]}
+    - {event_type: integrity_event, typical_effects: "Prices of affected credit types fall in days to weeks, buyers shift to CCP-labelled or renewables credits; then issuance suspensions, leadership changes, tighter standards, ratings and MRV demand. 1 to 18 months.", metrics: {integrity: down, carbon_price: down, demand: mixed, competition: mixed}, precedents: ["Guardian REDD+ Jan 2023: REDD+ prices down, nature avoidance -66% by 2024", "Kariba suspension, South Pole CEO exit Nov 2023", "ICVCM CCP premium up to ~25%"]}
+    - {event_type: big_offtake, typical_effects: "Validates credit or fuel type and sets price benchmark, supplier scales; then buyer concentration risk and copycat buyers. 0 to 12 months.", metrics: {demand: up, carbon_price: up, valuation: up, capital: up, competition: up}, precedents: ["Microsoft ~90% of 2025 durable CDR volume", "Microsoft buying pause exposes thin demand (Fastmarkets)", "GenZero-linked Amazon 680k t rice methane"]}
+    - {event_type: project_delay, typical_effects: "Impairment, guidance cut, lenders and offtakers reassess; then rights issues, asset sales, downgrades, distressed entry for patient buyers. 0 to 12 months.", metrics: {execution: down, valuation: down, capital: down, demand: mixed, pipeline: up}, precedents: ["Orsted Hornsea 4 halt, DKK60bn rights issue, shares -24%, S&P BBB- (2025)", "UK NorthPoint SAF uncertain after Fulcrum"]}
+    - {event_type: tech_cost, typical_effects: "Incumbent margins squeezed, new entrants raise; then offtake prices reset, learning-curve narratives spread. 6 to 36 months.", metrics: {economics: mixed, competition: up, valuation: mixed, carbon_price: down, demand: up}, precedents: ["Biochar 93% of Q1 2026 durable CDR volume", "Puro biochar CORC US$125-145 in 2025"]}
+    - {event_type: fraud_scandal, typical_effects: "Immediate write-down or exit, counterparties pause; then market-wide due diligence tightening and ratings and MRV demand. 0 to 6 months.", metrics: {integrity: down, valuation: down, demand: down, competition: mixed}, precedents: ["C-Quest Capital exit by GenZero", "South Pole Kariba 2023"]}
+sector_peers:
+  - {portfolio_company: Aurora Sustainable Lands, peers: [Chestnut Carbon, Finite Carbon, Mombak, Pachama]}
+  - {portfolio_company: Rize, peers: [Agreena, Indigo Ag, Regrow]}
+  - {portfolio_company: Carbo Culture, peers: [Charm Industrial, Exomad Green, Airex Energy, Oregon Biochar Solutions]}
+  - {portfolio_company: CycloKinetics, peers: [LanzaJet, Gevo, Twelve, Infinium]}
+  - {portfolio_company: Velocys, peers: [Infinium, Twelve, LanzaJet, Fulcrum BioEnergy]}
+  - {portfolio_company: Newlight Technologies, peers: [Mango Materials, Danimer Scientific, Origin Materials]}
+  - {portfolio_company: PCG Global, peers: [Sembcorp, Vena Energy, Equis]}
+  - {portfolio_company: Terra CO2, peers: [Brimstone, Sublime Systems, Fortera, Solidia]}
+  - {portfolio_company: BeZero Carbon, peers: [Sylvera, Calyx Global, Renoster, MSCI Carbon Markets]}
+  - {portfolio_company: Chooose, peers: [Normative, Watershed, Sweep, Persefoni]}
+  - {portfolio_company: Climate Impact X, peers: [Xpansiv, AirCarbon Exchange, Carbonplace, Senken]}
+  - {portfolio_company: South Pole, peers: [Climate Impact Partners, ClimeCo, Everland, Wildlife Works]}
+  - {portfolio_company: Perennial, peers: [Regrow, Indigo Ag, Agreena]}
+  - {portfolio_company: AJA Climate Solutions, peers: [Wildlife Works, Everland]}
+
+# Importance matrix: Claude grades each criterion 0-5 for every item; code computes
+# importance = sum(weight * score / 5) (0-100). Weights must sum to 100.
+scoring_matrix:
+  min_score_to_show: 30      # items below this are never shown, even in a quiet week (no padding)
+  criteria:
+    - id: exposure
+      weight: 30
+      question: "How directly does this touch GenZero?"
+      levels: {5: "names a GenZero portfolio company or fund", 4: "names a GenZero partner, or a direct competitor of a holding", 3: "names a rival climate investor, or a company in a GenZero focus sector", 2: "adjacent climate/energy sector", 1: "general climate news", 0: "no link"}
+    - id: materiality
+      weight: 10
+      question: "How much money or value is at stake?"
+      levels: {5: ">US$500M, or directly changes a holding's value", 4: "US$100-500M", 3: "US$20-100M or a clear measurable effect", 2: "<US$20M", 1: "size not stated", 0: "no financial angle"}
+    - id: downside_risk
+      weight: 30
+      question: "How serious is the negative signal for GenZero or its sectors?"
+      levels: {5: "failure, fraud, insolvency or cancellation at a holding, partner or direct competitor", 4: "major setback or policy rollback in a GenZero focus sector", 3: "sector setback elsewhere in climate or energy", 2: "mild negative", 1: "minor concern", 0: "neutral or positive news"}
+    - id: thesis_signal
+      weight: 15
+      question: "Does it change the investment case for a GenZero sector (policy, carbon prices, demand, cost)?"
+      levels: {5: "binding policy or large price/demand shift in a focus sector or Singapore/ASEAN", 4: "strong signal in a focus sector", 3: "moderate signal", 2: "weak signal", 1: "marginal", 0: "none"}
+    - id: actionability
+      weight: 10
+      question: "Should GenZero act or check something now?"
+      levels: {5: "act this week (deal, co-invest, risk review)", 3: "monitor closely", 1: "background only", 0: "nothing to do"}
+    - id: specificity
+      weight: 5
+      question: "How concrete and credible is the information?"
+      levels: {5: "confirmed facts with numbers from a reputable source", 3: "some detail", 1: "headline only or rumour", 0: "unverifiable"}

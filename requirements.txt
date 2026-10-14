@@ -1,0 +1,7 @@
+feedparser
+requests
+jinja2
+pyyaml
+anthropic>=1.13
+openai>=3.31
+pytest>=8

@@ -1,0 +1,6 @@
+.env
+__pycache__/
+.pytest_cache/
+# keep the sample newsletter as a deliverable; ignore audit JSON and other runs' files
+output/*
+!output/newsletter_2026-10-14.html

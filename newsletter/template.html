@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<title>GenZero Climate Tech News: week of {{ date }}</title>
+<style>
+@page { size: A4; margin: 10mm; }
+body { font-family: Arial, Helvetica, sans-serif; font-size: 9pt; line-height: 1.25; color: #000; background: #fff; max-width: 190mm; margin: 0 auto; padding: 0; }
+h1 { font-size: 14pt; margin: 0 0 6px; padding-bottom: 4px; border-bottom: 1px solid #000; }
+.item { margin: 0 0 6px; page-break-inside: avoid; }
+.item a { color: #000; font-weight: bold; }
+.line { margin: 1px 0 0 16px; }
+footer { margin-top: 10px; font-size: 8pt; color: #333; }
+</style></head><body>
+<h1>GenZero Climate Tech News: week of {{ date }}</h1>
+{% for i in items %}
+<div class="item">
+  <div>{{ loop.index }}. <a href="{{ i.url }}">{{ i.title }}</a> ({{ i.source }})</div>
+  <p class="line">What happened: {{ i.what }}</p>
+  <p class="line">Link to GenZero: {{ i.genzero_link }}</p>
+  <p class="line">Why it matters: {{ i.impact }}</p>
+</div>
+{% endfor %}
+<footer>Sources: {{ sources_ok|join(', ') or 'none' }}{% if sources_failed %} (failed: {{ sources_failed|join(', ') }}){% endif %}. Auto-generated, check sources before forwarding.</footer>
+</body></html>
