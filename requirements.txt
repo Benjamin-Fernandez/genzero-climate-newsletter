@@ -1,7 +1,14 @@
-feedparser
-requests
-jinja2
-pyyaml
+# Python 3.10+ (developed and tested on 3.12). Install from the project root: pip install -r requirements.txt
+
+# Core pipeline: RSS fetching, config, HTML rendering
+feedparser>=6.0
+requests>=2.31
+jinja2>=3.1
+pyyaml>=6.0
+
+# LLM backends: used when an API key is set in .env (Anthropic -> anthropic; OpenAI/Gemini/OpenRouter/any OpenAI-compatible URL -> openai)
 anthropic>=1.13
 openai>=3.31
+
+# Tests only: python -m pytest -q
 pytest>=8

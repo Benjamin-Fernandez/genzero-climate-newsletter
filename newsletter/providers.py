@@ -22,7 +22,7 @@ ANTHROPIC_BETA = "server-side-fallback-2026-07-01"
 PROVIDERS = ["anthropic", "openai", "gemini", "openrouter", "openai_compatible", "claude_cli"]
 KEY_VARS = {"anthropic": ["ANTHROPIC_API_KEY"], "openai": ["OPENAI_API_KEY"],
             "gemini": ["GEMINI_API_KEY", "GOOGLE_API_KEY"], "openrouter": ["OPENROUTER_API_KEY"]}
-NO_LLM_MESSAGE = "No LLM configured: set an API key in .env (see README); producing keyword-only newsletter"
+NO_LLM_MESSAGE = "No LLM configured: set an API key in .env (see deliverables/README.md); producing keyword-only newsletter"
 
 _default_models = {}
 _backend_cache = []   # [backend or None] once detection has run

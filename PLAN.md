@@ -1,7 +1,20 @@
 # PLAN: GenZero Weekly Climate-Tech Investor Newsletter
 
-> Status: approved design (2026-10-14, rev 2). D1–D6 decided. Rev 2 added the investor-impact engine (§5), sector peers and the fixed item format.
+> Status: **v1 complete, verified and published** (2026-10-14). Repo: https://github.com/Benjamin-Fernandez/genzero-climate-newsletter
 > Progress lives in `PROGRESS.md`. Rules for agents live in `CLAUDE.md`.
+
+## 0. Current state of the project (2026-10-14)
+| Area | State |
+|---|---|
+| Pipeline | Working end to end: `python run.py` → 8 RSS sources → ~120 in-window items graded → top 7 analysed → one A4 page (~2–2.5 min) |
+| LLM backends | Any API key in `.env` (Anthropic, OpenAI, Gemini, OpenRouter, any OpenAI-compatible URL) → else local Claude Code CLI → else keyword-only page |
+| Verified live | Claude Code CLI path (full runs, one-page check via Edge print-to-PDF, page order = importance order, no item older than 7 days) |
+| Verified by tests only | API-key backends: 20 unit and mocked tests pass (`python -m pytest -q`); no live API key was available during development |
+| Deliverables | `deliverables/REQUIREMENTS.md` (≤10 lines), `deliverables/README.md` (≤5 entries), `output/newsletter_2026-10-14.html` (sample), runnable code |
+| Fixed rules | Strict 7-day window; social-media posts never included; ranking only by the importance matrix (no quotas) |
+| Known gaps | Headline/snippet-only input; Google News RSS is unofficial; scores vary a few points between runs; peer lists partly unverified |
+
+Task-level history and next steps: `PROGRESS.md`.
 
 ## 1. Goal (one sentence)
 Running `python run.py` once a week produces a **one-page HTML newsletter** for GenZero's CEO and CIO.
@@ -24,16 +37,16 @@ portfolio**, with competitor/sector/peer fundraises and negative news given prio
 ```mermaid
 flowchart LR
     subgraph Sources["Sources (config.yaml)"]
-        S1[News RSS]
-        S2[Funding / deals feed]
-        S3[Policy / research feed]
+        S1[News RSS<br/>TechCrunch, Carbon Brief, Eco-Business]
+        S2[Funding / risk searches<br/>Google News, CTVC]
+        S3[Watchlist searches<br/>portfolio, peers, rival investors]
     end
 
     subgraph Pipeline["python run.py (single process)"]
         F[1. Fetch<br/>feedparser / requests<br/>last 7 days]
-        P[2. Clean<br/>dedupe + keyword/entity score<br/>cap ~60 items]
-        A1[3a. Triage<br/>1 batched Claude call<br/>event type, tier, relevance]
-        A2[3b. Impact analysis<br/>1 Claude call per top item<br/>reasoning chain → 3-part output]
+        P[2. Clean<br/>strict 7 days · drop social and non-English<br/>dedupe · entity/keyword context]
+        A1[3a. Triage<br/>LLM, parallel batches of 40<br/>6 matrix scores → importance 0-100]
+        A2[3b. Impact analysis<br/>1 LLM call per top-7 item<br/>reasoning chain → 3-part output]
         R[4. Render<br/>Jinja2 → one-page HTML]
     end
 
@@ -56,19 +69,19 @@ sequenceDiagram
     actor U as User
     participant Run as run.py
     participant Feeds as RSS / APIs
-    participant CL as claude.exe -p (local Claude Code)
+    participant CL as LLM backend (API key, else Claude Code CLI)
     participant FS as output/
 
     U->>Run: python run.py
-    Run->>Run: load config.yaml
+    Run->>Run: load .env + config.yaml, pick LLM backend
     loop each source (timeout 20s, fail-soft)
         Run->>Feeds: GET feed
         Feeds-->>Run: items (title, link, date, summary)
     end
-    Run->>Run: keep last 7 days, dedupe, keyword/entity score, cap ~60
-    Run->>CL: Stage A triage: all items + tiers (portfolio, partners, peers, competitors)
+    Run->>Run: keep last 7 days, drop social/non-English, dedupe, entity/keyword context
+    Run->>CL: Stage A triage: all items in batches of 40 + tiers + scoring matrix
     CL-->>Run: per item: event_type, entities+tier, 6 matrix scores, importance, sentiment, duplicate_of
-    alt triage failed (after 1 retry)
+    alt every triage batch failed (after 1 retry each)
         Run->>Run: fallback = top items by keyword score, raw summaries
     end
     Run->>Run: importance = weighted matrix (code) → top 7 above threshold
@@ -95,12 +108,12 @@ GenZero Climate Tech News: week of 14 Oct 2026
 2. ...
 (up to 7 items)
 
-Sources: Google News, TechCrunch, CTVC, Carbon Brief, Eco-Business · Auto-generated, check sources before forwarding.
+Sources: Google News (funding, negative, portfolio, peers), TechCrunch Climate, CTVC, Carbon Brief, Eco-Business · Auto-generated, check sources before forwarding.
 ```
 **Hard rules:** every item uses exactly these three labelled parts. Plain English, no jargon or unexplained acronyms
 (say "valuations of similar companies", not "comps"). Order = importance score from the weighted matrix (§5.2b). Categories are still used internally for ranking and the audit JSON, but they are never shown.
 
-## 4. Sources (DECIDED: recommended 5 + Eco-Business)
+## 4. Sources (DECIDED: 8 RSS feeds, see Chosen set)
 The researcher agent live-tested 17 candidates from this machine on 2026-10-14. None of them needs an API key.
 
 ### Access method comparison
@@ -147,11 +160,10 @@ and curated context. Implementation notes: use `requests` (it bundles CA certs, 
 issue seen with `urllib`) with an honest User-Agent; dedupe by normalised title because Google News repeats stories.
 
 ## 5. LLM step: the investor impact engine
-**Runtime:** your local Claude Code, called headless from Python via `subprocess`:
-`claude.exe -p <prompt> --output-format json --json-schema <schema> --model sonnet` (model configurable).
-It needs no API key and uses your existing Claude Code login. The binary is resolved via `CLAUDE_BIN` → PATH → newest VS
-Code extension (`claude` is currently **not** on PATH on this machine). Prompts live in `newsletter/prompts/*.md`, so
-they can be improved without touching code. All LLM access sits behind `llm.py`, so it can later be swapped to the Anthropic API in one file.
+**Runtime:** any LLM API key in `.env` is used first; otherwise the local Claude Code CLI runs headless
+(`claude -p --output-format json --json-schema <schema> --model sonnet`, binary resolved via `CLAUDE_BIN` → PATH → newest VS Code
+extension); with neither, a keyword-only newsletter is produced. Details in §5.0. Prompts live in `newsletter/prompts/*.md`, so
+they can be improved without touching code. All LLM access goes through `providers.complete_json()`.
 
 ### 5.0 LLM backends (added 2026-10-14 for hand-over)
 The receiver may not have VS Code or the Claude CLI, so **any LLM API key wins over the CLI**. Detection order (first match):
@@ -209,7 +221,7 @@ so weights and descriptions can be tuned without code. The triage prompt is gene
 | Specificity | 5 | How concrete and credible is it? | confirmed facts with numbers, reputable source | unverifiable |
 
 `importance = Σ weight × score / 5`. Code recomputes it, and its value is authoritative; a mismatch with Claude's own total is logged.
-Negative news gets its priority from the 20-point *Downside risk* criterion, not from reserved slots.
+Negative news gets its priority from the 30-point *Downside risk* criterion (weights re-tuned by the user to 30/10/30/15/10/5), not from reserved slots.
 Items scoring below `min_score_to_show` (default 30) are never shown, so a quiet week shows fewer items instead of filler.
 Every item's six scores and a one-line reason are saved in `items_DATE.json` for audit ("why was X shown above Y?").
 
@@ -233,14 +245,14 @@ flowchart LR
         Q1 --> Q2 --> Q3 --> Q4 --> Q5 --> Q6
     end
 ```
-- **Why two stages:** triage needs to compare *all* items (dedupe, rank), which suits one batched call. Impact analysis needs
+- **Why two stages:** triage grades *all* items in parallel batches of 40 (with cross-batch dedupe). Impact analysis needs
   *focused* reasoning per item, which suits one call per item. Deep analysis only runs on the 7 items that make the page, which keeps it fast
-  (~4–5 min in total).
+  (~2–2.5 min in total with the Claude CLI).
 - **Why the reasoning fields sit in the schema:** forcing Q1–Q5 to be answered *before* the three output lines makes the
   final "Impact" line come out of exposure, precedent and metrics rather than generic text. The reasoning is saved to `items_DATE.json`
   for audit (useful when the CEO asks "why do you say that?") but is not printed.
 - **Guardrails in the prompt:** facts come only from the item text. Precedent claims are phrased as hypotheses ("typically", "likely").
-  A company is called a holding only if it is in `portfolio`. If there is no credible link, Claude says so and relevance drops, so the item falls off the page.
+  A company is called a holding only if it is in `portfolio`. If there is no credible link, Claude says so and the exposure score drops, so the item falls off the page.
   Impact must name ≥1 concern from the checklist and a direction. Banned: "this is significant", "highlights the importance", and similar filler.
   **Plain English:** the three visible lines must read clearly to a CEO. No investor jargon or unexplained acronyms ("comps", "MOIC", "VCM" → spell out
   or rephrase). The framework's metric names are used for reasoning only and are translated into plain words in the output.
@@ -261,12 +273,14 @@ flowchart LR
 | Storage | Flat files (JSON) | No DB needed for a weekly batch of <200 items |
 
 
-### D2 (DECIDED: A): How many LLM calls per run?
+### D2 (DECIDED: A, later revised to C as built): How many LLM calls per run?
 | Option | Pros | Cons |
 |---|---|---|
-| **A. One batched call** (all ~60 items → one JSON) | Simplest; ~1–2 min; Claude sees all items together, so it can merge duplicate stories and rank relative to each other | One bad response affects everything (mitigated: 1 retry + keyword fallback); large prompt |
+| A. One batched call (all ~60 items → one JSON) | Simplest; ~1–2 min; Claude sees all items together, so it can merge duplicate stories and rank relative to each other | One bad response affects everything (mitigated: 1 retry + keyword fallback); large prompt |
 | B. One call per item | Isolated failures; easy to parallelise | ~60 CLI launches (each ~5–10 s of start-up) → 5–10 min; no cross-item comparison; more usage |
-| C. Two-stage: triage all (cheap) → write blurbs for top 10 | Best quality per blurb; less wasted writing | Two prompts to maintain; more moving parts for v1 |
+| **C. Two-stage: triage all → deep analysis of top items (as built)** | Best quality per item; less wasted writing | Two prompts to maintain; more moving parts |
+
+As built: triage runs in parallel batches of 40 (A's batching), then one impact call per top-7 item (C). See §5.3.
 
 ### D3 (DECIDED: A): What text does the LLM read?
 | Option | Pros | Cons |
@@ -276,24 +290,30 @@ flowchart LR
 Upgrade path: A now, then B for the top items only in v2.
 
 
-## 7. Project layout (target)
+## 7. Project layout (current)
 ```
-case_study/
-├── CLAUDE.md  PLAN.md  PROGRESS.md        # rules, design, status
-├── REQUIREMENTS.md  README.md             # deliverables (≤10 / ≤5 lines)
-├── config.yaml                            # sources, tiers (portfolio/partners/peers/competitors), impact framework, limits
-├── docs/research/                         # portfolio.md, impact_framework.md (sourced reference data)
-├── requirements.txt                       # feedparser, requests, jinja2, pyyaml
-├── run.py                                 # entry point: python run.py [--no-llm]  (window fixed at 7 days)
+genzero-climate-newsletter/
+├── deliverables/
+│   ├── README.md           # setup, sources used/rejected, how it works, limitations (≤5 entries)
+│   └── REQUIREMENTS.md     # confirmed requirements (≤10 lines)
+├── CLAUDE.md  PLAN.md  PROGRESS.md   # agent rules, design + current state, task log
+├── config.yaml             # sources, tiers, impact framework, scoring matrix, limits, LLM defaults
+├── .env.example            # copy to .env and paste ONE LLM API key (.env is git-ignored)
+├── requirements.txt        # feedparser, requests, jinja2, pyyaml, anthropic, openai, pytest
+├── run.py                  # entry point: python run.py [--no-llm]  (window fixed at 7 days)
 ├── newsletter/
-│   ├── fetch.py      # sources → normalised items
-│   ├── clean.py      # date window, dedupe, keyword filter, cap
-│   ├── llm.py        # claude CLI resolve/call + Stage A triage + Stage B impact + fallbacks
-│   ├── prompts/      # triage.md, impact.md (pre-prompt + question chain), editable without code
-│   ├── render.py     # selection + Jinja2
-│   └── template.html # one-page A4 layout, inline CSS
-├── output/                                # newsletter_DATE.html, items_DATE.json
-└── .claude/agents/                        # planner, researcher, software-engineer
+│   ├── fetch.py            # RSS sources → normalised items, strict 7-day window
+│   ├── watchlist.py        # builds Google News watchlist queries from config (≤4 names per query)
+│   ├── clean.py            # drop social/non-English/noise, dedupe, entity/keyword context
+│   ├── providers.py        # LLM backend detection (.env), Anthropic + OpenAI-compatible + Claude CLI, JSON parsing
+│   ├── llm.py              # Stage A triage (matrix), ranking, Stage B impact, fallbacks
+│   ├── prompts/            # triage.md, impact.md, editable without code
+│   ├── render.py           # Jinja2 rendering
+│   └── template.html       # one-page A4 plain-list layout
+├── tests/test_providers.py # backend detection, .env, schema, mocked Anthropic calls, JSON parsing
+├── docs/research/          # portfolio.md, impact_framework.md (sourced reference data)
+├── output/                 # newsletter_DATE.html (sample committed), items_DATE.json (git-ignored)
+└── .claude/                # agents (planner, researcher, software-engineer) + enhance-prompt skill
 ```
 
 ### How the agents build it
@@ -313,18 +333,18 @@ flowchart LR
 |---|---|---|
 | A feed changes URL / goes down | Fewer items | Per-source try/except; footer lists which sources succeeded; ≥3 sources gives redundancy |
 | Quiet news week | Thin newsletter | Strict 7-day window (never looks further back, by user requirement); items below the score threshold are hidden, so fewer items are shown rather than filler |
-| Claude CLI not found / not logged in / usage limit | No analysis | Clear error message; keyword-ranked fallback newsletter still produced |
-| LLM returns invalid JSON | No analysis | `--json-schema` enforcement + 1 retry + fallback |
+| No API key and no Claude CLI / invalid key / usage limit | No analysis | Clear message at startup; keyword-ranked fallback newsletter still produced |
+| LLM returns invalid JSON | No analysis | Schema-enforced output (CLI `--json-schema`, Anthropic structured outputs, OpenAI `response_format`), tolerant parsing, 1 retry, then fallback |
 | LLM hallucination (wrong amount, invented portfolio link) | Misleading item | Blurbs are built only from the provided summary; every item links to its source; footer: "verify before forwarding"; raw JSON saved for audit |
 | Generic "why it matters" | Low value to CEO | Impact framework pre-prompt + forced Q1–Q5 reasoning chain + banned-filler rule + must name a metric and direction; D3-B upgrade |
 | Wrong precedent or over-confident hypothesis | Misleading call | Precedents phrased as hypotheses; reasoning saved for audit; footer disclaimer |
 | Page overflow | >1 page | Hard caps (7 items; What ≤150, link ≤150, Impact ≤300 chars) + print CSS; check in print preview |
 | Same story from 3 sources | Repetition | URL + title-similarity dedupe; Stage A `duplicate_of` merges the rest |
 | Stage B slow (7 CLI calls) | Run takes minutes | ≤4 parallel; per-call timeout; failed item falls back to quick take |
-| Runs only on this PC (CLI login) | Not server-ready | `llm.py` isolation → swap to Anthropic API for scheduling later |
+| Non-Claude provider behaves differently | Weaker or malformed output | Schema sanitised to a common subset; json_schema → json_object → plain-JSON fallback chain; tested with mocks only, so check the first live run |
 
 ## 9. Future improvements (explicitly NOT in v1)
-Full-text extraction · cross-week "already reported" memory · email delivery · Windows Task
+Live-test each API provider · full-text extraction · cross-week "already reported" memory · email delivery · Windows Task
 Scheduler / cloud cron · paid deal databases (PitchBook, Crunchbase, Sightline) · portfolio list
 synced from an internal source · evaluation set to measure relevance quality.
 
@@ -350,3 +370,5 @@ synced from an internal source · evaluation set to measure relevance quality.
 | 2026-10-14 | Every in-window item is graded by the matrix (parallel triage batches of 40, safety cap 200); keyword score is context only, never a cut | A keyword pre-cut to 60 silently removed most negative news, contradicting 'top matrix scorers are shown' |
 | 2026-10-14 | Social-media posts (Facebook, X, LinkedIn, YouTube, TikTok, Reddit…) always excluded, hardcoded in `clean.py` with no config option | User: there must never be an option to include social posts |
 | 2026-10-14 | API-key backends (Anthropic SDK; OpenAI-compatible SDK for OpenAI/Gemini/OpenRouter/any base URL) take priority over the Claude CLI; `.env` support | User is submitting the project; the receiver may not have VS Code or the Claude CLI |
+| 2026-10-14 | Matrix weights re-tuned to 30/10/30/15/10/5 (exposure, materiality, downside risk, investment-case signal, actionability, specificity) | User edit: downside risk weighted equal to exposure, money at stake reduced |
+| 2026-10-14 | README and REQUIREMENTS moved to `deliverables/`; requirements.txt annotated; §0 current-state section added | User request for hand-over |

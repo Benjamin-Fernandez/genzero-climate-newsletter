@@ -2,9 +2,10 @@
 
 ## What this project is
 A one-command Python pipeline (`python run.py`) that pulls the last 7 days of climate-tech news from
-≥3 sources (≥2 source types), uses Claude (local Claude Code CLI, headless) to categorise and score
-relevance against GenZero's portfolio and competitors, and renders a ONE-PAGE HTML newsletter for the
-CEO and CIO. Full design: `PLAN.md`. Live status: `PROGRESS.md`.
+≥3 sources (≥2 source types), uses an LLM (any API key in `.env` first, else the local Claude Code CLI) to grade every item on an importance
+matrix against GenZero's portfolio, peers and competitors, and renders a ONE-PAGE HTML newsletter for the
+CEO and CIO. Full design and current state: `PLAN.md`. Task log: `PROGRESS.md`. Deliverables: `deliverables/`.
+Published at https://github.com/Benjamin-Fernandez/genzero-climate-newsletter (commit and push after verified changes).
 
 ## START OF EVERY SESSION (mandatory)
 1. Read `PROGRESS.md` → "Current state" and "Next step". Resume from there; do not restart work.
@@ -16,11 +17,11 @@ CEO and CIO. Full design: `PLAN.md`. Live status: `PROGRESS.md`.
   frameworks, databases, queues, web servers or async code unless the user approves it.
 - **No design changes without the user.** If a choice has trade-offs that PLAN.md does not settle, present
   2–3 options with pros/cons (AskUserQuestion) and record the outcome in `PLAN.md` § Decision log.
-- **Deliverable size limits are hard limits:** REQUIREMENTS.md ≤ 10 lines, README.md ≤ 5 lines,
+- **Deliverable size limits are hard limits:** `deliverables/REQUIREMENTS.md` ≤ 10 lines, `deliverables/README.md` ≤ 5 entries,
   newsletter ≤ 1 printed A4 page, each news item 2–4 lines (what happened + why it matters to investors/GenZero).
 - **Stability over coverage:** prefer RSS / no-key APIs over scraping. A failing source must be logged
   and skipped, never crash the run.
-- **Secrets:** none required for the default design. Never commit keys; use env vars if ever needed.
+- **Secrets:** LLM API keys live only in the git-ignored `.env` (template `.env.example`). Never commit, print or log them.
 - Windows 11 + Python 3.12. The `claude` CLI is NOT on PATH; it is bundled with the VS Code extension
   (`~/.vscode/extensions/anthropic.claude-code-*/resources/native-binary/claude.exe`). Code must
   resolve it via `CLAUDE_BIN` env var → `claude` on PATH → newest VS Code extension binary.

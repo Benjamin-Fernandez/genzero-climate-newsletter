@@ -57,6 +57,8 @@ code importance matches weights for all rows; full triage audit in output/items_
 - [x] T4.2 README updated for fuss-free setup (key in .env → python run.py)
 - [x] T4.3 Publish to GitHub: public repo Benjamin-Fernandez/genzero-climate-newsletter (sample newsletter committed; .env and audit JSON ignored)
 
+- [x] T4.4 README + REQUIREMENTS moved to deliverables/; requirements.txt annotated (versions, purpose); PLAN §0 current state + stale sections fixed; references updated
+
 ### Phase 3: Deliverables
 - [x] T3.1 README.md (≤5 lines: run, sources used, rejected + why, limitations)
 - [ ] T3.2 Generate this week's newsletter; human review of the output
@@ -78,3 +80,4 @@ code importance matches weights for all rows; full triage audit in output/items_
 - 2026-10-14: User is submitting the project → T4.1 API-key backends started (any key beats the CLI). PLAN §5.0 added.
 - 2026-10-14: T4.1/T4.2 done and verified (pytest 20 passed; full run via CLI 136s, 7 items). PLAN §6 updated for API keys. Publishing to GitHub (T4.3).
 - 2026-10-14: Published https://github.com/Benjamin-Fernandez/genzero-climate-newsletter (public, main @ 40f9914). Commit identity set per-repo only.
+- 2026-10-14: T4.4 deliverables/ folder, requirements.txt, PLAN state refresh (user had re-tuned matrix weights to 30/10/30/15/10/5 in config; PLAN now consistent).

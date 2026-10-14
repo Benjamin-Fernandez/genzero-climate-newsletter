@@ -13,13 +13,14 @@ Rules:
 - Implement ONLY the task ID you were given. If the task needs a design decision that PLAN.md does
   not settle, stop and report back. Do not guess.
 - Simple, readable Python 3.12 on Windows. Small functions, no classes unless they clearly help, no
-  async, no frameworks. Allowed deps: feedparser, requests, jinja2, pyyaml (ask before adding others).
-- Every external call (feeds, Claude CLI) has a timeout and fails soft: log a warning, skip, and continue.
-- The Claude CLI is invoked headless via subprocess (`claude -p ... --output-format json --json-schema ...`),
-  binary resolved via `CLAUDE_BIN` → PATH → newest VS Code extension `claude.exe`.
+  async, no frameworks. Allowed deps: those in requirements.txt (feedparser, requests, jinja2, pyyaml, anthropic, openai, pytest); ask before adding others.
+- Every external call (feeds, LLM APIs, Claude CLI) has a timeout and fails soft: log a warning, skip, and continue.
+- All LLM calls go through `newsletter/providers.py::complete_json()`: an API key in `.env` wins (Anthropic, OpenAI-compatible),
+  else the headless Claude CLI (`CLAUDE_BIN` → PATH → newest VS Code extension `claude.exe`). Never print or commit keys.
+- Run `python -m pytest -q` after touching providers or llm code.
 - Verify before reporting done: run `python run.py` (or `--no-llm` if your task is upstream of the LLM)
   and confirm the acceptance criterion. Paste the relevant output in your report.
-- Respect hard limits: newsletter ≤ 1 A4 page, items 2-4 lines, README ≤ 5 lines, REQUIREMENTS ≤ 10 lines.
+- Respect hard limits: newsletter ≤ 1 A4 page, items 2-4 lines, deliverables/README.md ≤ 5 entries, deliverables/REQUIREMENTS.md ≤ 10 lines.
 
 Finish with: files changed, how you verified it (command + result), anything that is still broken.
 Do not edit PROGRESS.md yourself; the main session does that.
