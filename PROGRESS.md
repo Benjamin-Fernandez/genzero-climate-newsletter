@@ -55,7 +55,7 @@ code importance matches weights for all rows; full triage audit in output/items_
 ### Phase 4: Hand-over
 - [x] T4.1 API-key LLM backends (providers.py, .env/.env.example, anthropic + openai SDKs). 20 tests pass; non-CLI paths verified by mocks only (Ollama test cancelled by user). Full CLI run re-verified by main session.
 - [x] T4.2 README updated for fuss-free setup (key in .env → python run.py)
-- [ ] T4.3 Publish to GitHub: public repo Benjamin-Fernandez/genzero-climate-newsletter (sample newsletter committed; .env and audit JSON ignored)
+- [x] T4.3 Publish to GitHub: public repo Benjamin-Fernandez/genzero-climate-newsletter (sample newsletter committed; .env and audit JSON ignored)
 
 ### Phase 3: Deliverables
 - [x] T3.1 README.md (≤5 lines: run, sources used, rejected + why, limitations)
@@ -77,3 +77,4 @@ code importance matches weights for all rows; full triage audit in output/items_
 - 2026-10-14: Social posts now ALWAYS excluded (hardcoded SOCIAL_SOURCES + domain check in clean.py; config key removed, by user requirement). Full run re-verified: 3 social posts dropped, 129 s, 7 analysed items.
 - 2026-10-14: User is submitting the project → T4.1 API-key backends started (any key beats the CLI). PLAN §5.0 added.
 - 2026-10-14: T4.1/T4.2 done and verified (pytest 20 passed; full run via CLI 136s, 7 items). PLAN §6 updated for API keys. Publishing to GitHub (T4.3).
+- 2026-10-14: Published https://github.com/Benjamin-Fernandez/genzero-climate-newsletter (public, main @ 40f9914). Commit identity set per-repo only.
